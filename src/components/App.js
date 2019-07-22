@@ -1,14 +1,12 @@
 import React, { PureComponent } from "react";
-import setPrevWeather from "../actions/prevWeatherAction";
 import SearchWeather from "./SearchWeather";
 import DescriptionWeather from "./DescriptionWeather";
 import Input from "./Input";
 import Details from "./Details";
 import Loading from "./Loading";
 import WeatherServise from "./WeatherServise";
-import { connect } from "react-redux";
-import { getWeather } from "../actions/weatherAction";
-import { setWeatherServise } from "../actions/weatherServiseAction";
+import searchWeather from '../additionFunc/searchWeather';
+import getWeather from '../additionFunc/getWeather';
 import PropTypes from "prop-types";
 
 class App extends PureComponent {
@@ -37,8 +35,8 @@ class App extends PureComponent {
     if (!city) {
       window.ymaps.ready(()=> this.setState(() => ({
         city : window.ymaps.geolocation.city.toUpperCase()
-    },
-      this.searchWeatherForCity(window.ymaps.geolocation.city.toUpperCase()) )))
+    }),
+      this.searchWeatherForCity(window.ymaps.geolocation.city.toUpperCase()) ))
     }
   };
 
@@ -49,57 +47,28 @@ class App extends PureComponent {
   };
 
   searchWeatherForCity = city => {
-    const { weatherServise } = this.props.weatherServise;
+    const { weatherServise } = this.state;
     const {
-      setWeatherAction,
-      prevWeatherAction,
       loadedCityWeatherOpenweathermap,
       loadedCityWeatherMetaweather
-    } = this.props;
-   if(this.state.error){
-    this.setState({ error: false });
-   }
-    if (weatherServise === "Openweathermap") {
-      if (loadedCityWeatherOpenweathermap[city]) {
-        console.log("current city weather excist");
-        if (
-          new Date().getHours() -
-            loadedCityWeatherOpenweathermap[city].lastUpdate <
-          2
-        ) {
-          let cityWeather = loadedCityWeatherOpenweathermap[city];
-          prevWeatherAction(cityWeather);
-        } else {
-          setWeatherAction(city, weatherServise);
-        }
-      } else {
-        setWeatherAction(city, weatherServise);
-      }
-    }
-    if (weatherServise === "MetaWeather") {
-      if (loadedCityWeatherMetaweather[city]) {
-        console.log("current city weather excist");
-        if (
-          new Date().getHours() -
-            loadedCityWeatherMetaweather[city].lastUpdate <
-          2
-        ) {
-          let cityWeather = loadedCityWeatherMetaweather[city];
-          prevWeatherAction(cityWeather);
-        } else {
-          setWeatherAction(city, weatherServise);
-        }
-      } else {
-        setWeatherAction(city, weatherServise);
-      }
-    }
+    } = this.state;
+    console.log(this.state, 'state in searchWeatherForCity');
+    let rez;
+    if(weatherServise=== "Openweathermap") {
+      searchWeather(city,weatherServise,loadedCityWeatherOpenweathermap)
+      .then((data)=>this.setState({weather: data}))
+    } 
+    if(weatherServise=== "MetaWeather") {
+      searchWeather(city,weatherServise,loadedCityWeatherMetaweather);
+    };
+   
   };
 
   render() {
     const { weatherServise } = this.state;
-    const { weather } = this.props.weather;
-    const { isFetching, error } = this.props.weather;
-  console.log( weatherServise, ' weatherServise state')
+    const { weather } = this.state;
+    const { isFetching, error } = this.state;
+  console.log( this.state, ' state')
     return (
       <div
         className={
@@ -138,29 +107,4 @@ class App extends PureComponent {
   }
 }
 
-App.propTypes = {
-  weatherServise: PropTypes.object.isRequired,
-  weather: PropTypes.object.isRequired
-};
-
-const mapStateToProps = store => {
-  console.log(store, "store");
-  return {
-    weatherServise: store.weatherServise,
-    weather: store.weather,
-    loadedCityWeatherOpenweathermap: store.loadedCityWeatherOpenweathermap,
-    loadedCityWeatherMetaweather: store.loadedCityWeatherMetaweather
-  };
-};
-const mapDispatchToProps = dispatch => {
-  return {
-    prevWeatherAction: weather => dispatch(setPrevWeather(weather)),
-    setWeatherServiseAction: servise => dispatch(setWeatherServise(servise)),
-    setWeatherAction: (weather, weatherServise) =>
-      dispatch(getWeather(weather, weatherServise))
-  };
-};
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
+export default App;
