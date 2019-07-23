@@ -1,3 +1,4 @@
+require('dotenv').config();
 import React, { PureComponent } from "react";
 import SearchWeather from "./SearchWeather";
 import DescriptionWeather from "./DescriptionWeather";

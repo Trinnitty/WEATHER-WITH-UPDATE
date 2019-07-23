@@ -1,7 +1,5 @@
-import {apiKeyOpenWeather} from '../keys/keys';
-
 export default function openWeatherServise(city){
-  return fetch(`https://cors-anywhere.herokuapp.com/https://openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKeyOpenWeather}`
+  return fetch(`https://cors-anywhere.herokuapp.com/https://openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_apiKeyOpenWeather}`
     )
     .then(response => response.json())
     .then(jsonData => {

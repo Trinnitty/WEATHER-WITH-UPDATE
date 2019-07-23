@@ -1,8 +1,6 @@
-import {apiKeyMetaWeather} from '../keys/keys';
-
 export default function metaweatherService(city, storeWeather){
     fetch(
-      `https://cors-anywhere.herokuapp.com/https://api.weatherbit.io/v2.0/current?city=${city}&key=${apiKeyMetaWeather}`
+      `https://cors-anywhere.herokuapp.com/https://api.weatherbit.io/v2.0/current?city=${city}&key=${process.env.REACT_APP_apiKeyMetaWeather}`
     ).then(response => response.json())
     .then(jsonData => {
       console.log(jsonData, "jsonData");
