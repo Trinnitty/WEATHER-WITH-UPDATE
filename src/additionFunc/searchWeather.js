@@ -1,15 +1,14 @@
 import getWeather from '../additionFunc/getWeather';
+import openWeatherServise from '../services/openWeatherServise';
+import metaweatherService from '../services/metaweatherService';
 
-export default function searchWeather (city,weatherServise,storeWeather){
-  console.log(storeWeather, 'storeWeather');
-    if (storeWeather[city]) {
-        console.log("current city weather excist");
-        if (
-          new Date().getHours() - storeWeather[city].lastUpdate <2
-        ) {
-          let cityWeather = storeWeather[city];
-          return this.setState({weather : cityWeather});
-        } 
-    } 
-    return getWeather(city, weatherServise,storeWeather);
+export default function searchWeather (city,weatherServise){
+  switch (weatherServise) {
+    case  "Openweathermap":
+      getWeather(city, weatherServise, openWeatherServise)
+      break;
+    case "MetaWeather":
+      getWeather(city, weatherServise, metaweatherService)
+      break;
+  }
   }

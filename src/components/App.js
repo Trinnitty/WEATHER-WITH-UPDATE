@@ -6,7 +6,6 @@ import Details from "./Details";
 import Loading from "./Loading";
 import WeatherServise from "./WeatherServise";
 import searchWeather from '../additionFunc/searchWeather';
-import getWeather from '../additionFunc/getWeather';
 import PropTypes from "prop-types";
 
 class App extends PureComponent {
@@ -25,18 +24,18 @@ class App extends PureComponent {
       description: "",
       wind: ""
     },
-    loadedCityWeatherOpenweathermap: {},
-    loadedCityWeatherMetaweather: {}
+    historyWeather:{
+      "Openweathermap":{},
+      "MetaWeather": {}
+    }
   };
 
   componentDidMount = () => {
     const { city } = this.state;
     // if first enter on the app
     if (!city) {
-      window.ymaps.ready(()=> this.setState(() => ({
-        city : window.ymaps.geolocation.city.toUpperCase()
-    }),
-      this.searchWeatherForCity(window.ymaps.geolocation.city.toUpperCase()) ))
+      window.ymaps.ready(()=> 
+      this.searchWeatherForCity(window.ymaps.geolocation.city.toUpperCase()) )
     }
   };
 
@@ -47,25 +46,20 @@ class App extends PureComponent {
   };
 
   searchWeatherForCity = city => {
-    const { weatherServise } = this.state;
+    this.setState({city:city, isFetching: true})
     const {
-      loadedCityWeatherOpenweathermap,
-      loadedCityWeatherMetaweather
+      weatherServise,
+      historyWeather
     } = this.state;
-    console.log(this.state, 'state in searchWeatherForCity');
-    let rez;
-    if(weatherServise=== "Openweathermap") {
-      searchWeather(city,weatherServise,loadedCityWeatherOpenweathermap)
-      .then((data)=>this.setState({weather: data}))
-    } 
-    if(weatherServise=== "MetaWeather") {
-      searchWeather(city,weatherServise,loadedCityWeatherMetaweather);
-    };
-   
+    if (historyWeather[weatherServise][city] &&  new Date().getHours() - historyWeather[weatherServise][city].lastUpdate <2) {
+      this.setState( {weather: historyWeather[weatherServise][city], isFetching: false})
+    }else{
+      searchWeather(city, weatherServise, historyWeather);
+    }
   };
-
+  
   render() {
-    const { weatherServise } = this.state;
+    const { weatherServise, city } = this.state;
     const { weather } = this.state;
     const { isFetching, error } = this.state;
   console.log( this.state, ' state')
@@ -82,12 +76,6 @@ class App extends PureComponent {
           <Input searchWeatherForCity={this.searchWeatherForCity} />
           <SearchWeather setWeatherServise={this.setWeatherServise} />
         </div>
-
-        {this.state.error && (
-          <div className="errorBlock">
-            Reload page or try it in another time (may be you are blocked)
-          </div>
-        )}
         {error ? (
           <div className="errorBlock">
             Correct entered data or reload page and repeat response
@@ -96,7 +84,7 @@ class App extends PureComponent {
           <div>
             {(isFetching && <Loading />) || (
               <div>
-                <DescriptionWeather  weather={weather} />
+                <DescriptionWeather  weather={weather} city={city}/>
                 <Details weather={weather} />
               </div>
             )}
