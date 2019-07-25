@@ -1,9 +1,11 @@
-export default function metaweatherService(city, storeWeather){
-    fetch(
-      `https://cors-anywhere.herokuapp.com/https://api.weatherbit.io/v2.0/current?city=${city}&key=${process.env.REACT_APP_apiKeyMetaWeather}`
+import {apiKeyMetaWeather} from '../keys/keys'
+
+export default function metaweatherService(city, weatherServise,historyWeather){
+  console.log(process.env.REACT_APP_apiKeyMetaWeather);
+    return fetch(
+      `http://api.weatherbit.io/v2.0/current?city=${city}&key=apiKeyMetaWeather`
     ).then(response => response.json())
     .then(jsonData => {
-      console.log(jsonData, "jsonData");
       let data = jsonData.data[0];
       let responce = {
         city: city,
@@ -18,9 +20,10 @@ export default function metaweatherService(city, storeWeather){
       return responce;
     })
     .then(data => {
-      this.setState({ weather: data, storeWeather : {...storeWeather, city:{data} }});
-    })
+      return {weather: data, isFetching: false, error: false,historyWeather: {...historyWeather,[weatherServise]:{[city]:data}}};
+    }
+    )
     .catch(error => {
-      // this.setState({ error: true});
+      return {error: true, isFetching: false};
     });
 }

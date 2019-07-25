@@ -1,14 +1,12 @@
-import getWeather from '../additionFunc/getWeather';
+
 import openWeatherServise from '../services/openWeatherServise';
 import metaweatherService from '../services/metaweatherService';
 
-export default function searchWeather (city,weatherServise){
+export default function searchWeather (city,weatherServise,historyWeather){
   switch (weatherServise) {
     case  "Openweathermap":
-      getWeather(city, weatherServise, openWeatherServise)
-      break;
+     return openWeatherServise(city,weatherServise,historyWeather);
     case "MetaWeather":
-      getWeather(city, weatherServise, metaweatherService)
-      break;
+      return metaweatherService(city,weatherServise,historyWeather);
   }
   }

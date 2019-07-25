@@ -1,4 +1,4 @@
-require('dotenv').config();
+
 import React, { PureComponent } from "react";
 import SearchWeather from "./SearchWeather";
 import DescriptionWeather from "./DescriptionWeather";
@@ -53,9 +53,9 @@ class App extends PureComponent {
       historyWeather
     } = this.state;
     if (historyWeather[weatherServise][city] &&  new Date().getHours() - historyWeather[weatherServise][city].lastUpdate <2) {
-      this.setState( {weather: historyWeather[weatherServise][city], isFetching: false})
+      this.setState( {weather: historyWeather[weatherServise][city], isFetching: false, error: false})
     }else{
-      searchWeather(city, weatherServise, historyWeather);
+      let weather = searchWeather(city, weatherServise,historyWeather).then((data)=> this.setState({...data}));
     }
   };
   
@@ -63,7 +63,6 @@ class App extends PureComponent {
     const { weatherServise, city } = this.state;
     const { weather } = this.state;
     const { isFetching, error } = this.state;
-  console.log( this.state, ' state')
     return (
       <div
         className={

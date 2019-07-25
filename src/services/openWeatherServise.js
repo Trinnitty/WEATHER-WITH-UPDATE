@@ -1,6 +1,7 @@
-export default function openWeatherServise(city){
-  return fetch(`https://cors-anywhere.herokuapp.com/https://openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_apiKeyOpenWeather}`
-    )
+import {apiKeyOpenWeather} from '../keys/keys';
+
+export default function openWeatherServise(city, weatherServise,historyWeather){
+  return fetch(`http://openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKeyOpenWeather}`)
     .then(response => response.json())
     .then(jsonData => {
       let response = {
@@ -13,5 +14,11 @@ export default function openWeatherServise(city){
         wind: jsonData.wind.speed
       };
       return response;
-    })
+    }).then((data)=> {
+      return {weather: data, isFetching: false,error: false, historyWeather: {...historyWeather,[weatherServise]:{[city]:data}}};
+      }
+      )
+      .catch((error)=>{
+        return {error: true, isFetching: false};
+      })
 }
